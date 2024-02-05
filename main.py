@@ -15,7 +15,7 @@ download_dir = 'downloads'
 os.makedirs(download_dir, exist_ok=True)
 
 ydl_opts = {
-    'format': 'bestaudio/best',
+    'format': 'best',
     'outtmpl': f'{download_dir}/%(title)s [%(id)s].%(ext)s',
 }
 
