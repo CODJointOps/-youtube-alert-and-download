@@ -46,7 +46,7 @@ async def check_new_videos():
                 ydl.download([video_url])
             add_downloaded_video(video_id)
             channel = bot.get_channel(int(DISCORD_CHANNEL_ID))
-            await channel.send(f"everyone New video uploaded and downloaded: {video_url}")
+            await channel.send(f"@everyone New tard video dropped and has been archived: {video_url}")
 
 @bot.event
 async def on_ready():
