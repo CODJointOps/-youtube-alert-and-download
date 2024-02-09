@@ -33,7 +33,7 @@ def get_latest_video_url(channel_id):
     latest_entry = feed.entries[0] if feed.entries else None
     return latest_entry.link, latest_entry.yt_videoid if latest_entry else (None, None)
 
-@tasks.loop(minutes=10)
+@tasks.loop(minutes=5)
 async def check_new_videos():
     downloaded_videos = get_downloaded_videos()
     for channel_id in YOUTUBE_CHANNEL_IDS:
