@@ -45,7 +45,7 @@ async def check_new_videos():
                 os.makedirs(channel_download_dir, exist_ok=True)
                 
                 ydl_opts = {
-                    'format': 'best',
+                    'format': 'bestvideo+bestaudio/best',
                     'outtmpl': f'{channel_download_dir}/%(title)s [%(id)s].%(ext)s',
                 }
                 
@@ -67,4 +67,3 @@ async def on_ready():
     check_new_videos.start()
 
 bot.run(DISCORD_BOT_TOKEN)
-
