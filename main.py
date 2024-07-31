@@ -60,7 +60,7 @@ async def check_new_videos():
                         ydl.download([video_url])
                     add_downloaded_video(video_id)
                     channel = bot.get_channel(int(DISCORD_CHANNEL_ID))
-                    await channel.send(f"@everyone New video dropped and has been archived: {video_url}")
+                    await channel.send(f"@everyone New tard video dropped and has been archived: {video_url}")
                     print(f"Downloaded and notified for video {video_id} from channel: {channel_id}")
                 else:
                     print(f"Video URL or ID missing for video ID {video_id} from channel: {channel_id}")
