@@ -5,6 +5,13 @@ import yt_dlp as youtube_dl
 from config import DISCORD_BOT_TOKEN, DISCORD_CHANNEL_ID, YOUTUBE_CHANNEL_IDS
 import os
 import asyncio
+import logging
+
+logging.basicConfig(
+    filename='yt_dlp.log',
+    format='%(asctime)s %(levelname)s:%(message)s',
+    level=logging.DEBUG
+)
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -41,7 +48,7 @@ async def check_new_videos():
     max_videos_to_download = 9
 
     for channel_id in YOUTUBE_CHANNEL_IDS:
-        print(f"Checking new videos for channel: {channel_id}")
+        logging.info(f"Checking new videos for channel: {channel_id}")
         try:
             videos = get_all_videos(channel_id)
             videos.sort(key=lambda x: x[2])
@@ -52,25 +59,33 @@ async def check_new_videos():
                     channel_download_dir = os.path.join(download_dir, channel_id)
                     os.makedirs(channel_download_dir, exist_ok=True)
                     ydl_opts = {
-                        'format': 'bestvideo+bestaudio/best',
+                        'format': 'best',  # Simplified format
                         'outtmpl': f'{channel_download_dir}/%(title)s [%(id)s].%(ext)s',
-                        'cookiefile': 'cookies.txt',
+                        'cookiefile': os.path.join(os.getcwd(), 'cookies.txt'),
+                        'quiet': True,
+                        'no_warnings': True,
+                        'ignoreerrors': True,
                     }
-                    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                        ydl.download([video_url])
-                    add_downloaded_video(video_id)
-                    channel = bot.get_channel(int(DISCORD_CHANNEL_ID))
-                    await channel.send(f"@everyone New tard video dropped and has been archived: {video_url}")
-                    print(f"Downloaded and notified for video {video_id} from channel: {channel_id}")
+                    try:
+                        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                            ydl.download([video_url])
+                        add_downloaded_video(video_id)
+                        channel = bot.get_channel(int(DISCORD_CHANNEL_ID))
+                        await channel.send(f"@everyone New video uploaded: {video_url}")
+                        logging.info(f"Downloaded and notified for video {video_id} from channel: {channel_id}")
+                    except youtube_dl.utils.DownloadError as e:
+                        logging.error(f"DownloadError for video {video_id}: {e}")
+                    except Exception as e:
+                        logging.error(f"Unexpected error for video {video_id}: {e}")
                 else:
-                    print(f"Video URL or ID missing for video ID {video_id} from channel: {channel_id}")
+                    logging.warning(f"Video URL or ID missing for video ID {video_id} from channel: {channel_id}")
         except Exception as e:
-            print(f"Error processing channel {channel_id}: {e}")
+            logging.error(f"Error processing channel {channel_id}: {e}")
         await asyncio.sleep(5)
 
 @bot.event
 async def on_ready():
-    print(f'{bot.user.name} has connected to Discord!')
+    logging.info(f'{bot.user.name} has connected to Discord!')
     check_new_videos.start()
 
 bot.run(DISCORD_BOT_TOKEN)
